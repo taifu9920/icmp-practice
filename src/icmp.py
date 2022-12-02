@@ -21,15 +21,15 @@ def receive(sock, size):
         return Type, code, checksum, ID, seq, zlib.decompress(recv_packet[28:]), addr
     return None
     
-def send(target, ID = 0x1234, data = b""):
+def send(target, ID = 0x1234, data = b"", Type=8):
     data = zlib.compress(data)
     while len(data) < 18 or len(data) % 2 != 0: data += b" " # padding
     sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
-    header = struct.pack("bbHHh", 8, 0, 0, ID, 1)
+    header = struct.pack("bbHHh", Type, 0, 0, ID, 1)
     # htons() will convert decimal into network formatting
     # (BE & LE problem)
     checksum = socket.htons(get_checksum(header + data))
-    header = struct.pack("bbHHh", 8, 0, checksum, ID, 1)
+    header = struct.pack("bbHHh", Type, 0, checksum, ID, 1)
     packet = header + data
     sock.sendto(packet, (target, 1))
     return sock
