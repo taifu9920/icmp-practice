@@ -58,7 +58,7 @@ def process(IP, data, ID):
                     print("Web request successful and released")
                 except Exception as e:
                     proxy.close()
-                    print("Request onnection failed")
+                    print("Request connection failed")
 
 def icmp_listener():
     #ICMP to TCP
