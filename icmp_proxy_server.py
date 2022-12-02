@@ -11,8 +11,7 @@ def forward(conn, target, ID):
     try:
         while status[0]:
             data = conn.recv(buffersize)
-            if data:
-                proxy = send(target, ID, data, 0)
+            if data: send(target, ID, data, 0)
             else: break
     except Exception as e:
         raise e
