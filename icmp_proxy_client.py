@@ -18,20 +18,20 @@ def forward(conn, target, ID):
     except Exception as e:
         raise e
 
-def icmp_forward(target):
+def icmp_forward(target, ID):
     #ICMP to TCP
     try:
-        icmp = send(target, 0x0000, b"")
+        icmp = send(target, ID, b"")
         ping = receive(icmp, buffersize)
         while not ping: 
-            icmp = send(target, 0x0000, b"")
+            icmp = send(target, ID, b"")
             ping = receive(icmp, buffersize)
         print("Ping successful")
         while status[0]:
             result = receive(icmp, buffersize)
+            print(result)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                print(data)
                 if TCPs.get(ID):
                     try:
                         TCPs[ID].send(data)
@@ -53,6 +53,7 @@ def recv(status, sock, target):
         if(method.lower() == b"connect"):
             try:
                 threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
+                threading.Thread(target=icmp_forward, args=(target,addr[1]), daemon = True).start()
                 print("Trying to connect ICMP proxy server...")
                 result = must_send(target, buffersize, 8, addr[1], data)
                 print("Connection request sent")
@@ -81,9 +82,7 @@ def main():
         print(f"Server is listening on {port}")
         print("Waiting for connections...")
         threading.Thread(target=recv, args = (status, sock, target), daemon = True).start()
-        #ICMP listener
-        threading.Thread(target=icmp_forward, args=(target,), daemon = True).start()
-        
+
         while status[0]:
             cmd = input("Terminal# ").lower().strip()
             if cmd == "stop" or cmd == "exit":
