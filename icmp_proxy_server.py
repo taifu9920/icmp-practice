@@ -69,7 +69,7 @@ def icmp_listener():
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                print(ID, data)
+                print(result)
                 send(IP, ID, data, 0) # echo reply
                 if data: threading.Thread(target=process, args=(IP, data, ID)).start()
     except Exception as e:
