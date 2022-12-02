@@ -24,6 +24,7 @@ def forward(conn, target, ID):
         raise e
 
 def process(IP, data, ID):
+    data = zlib.decompress(data)
     method = data[:data.find(b" ")]
     URL = data[data.find(b" ")+1:]
     version = data[data.find(b" ")+1:]
@@ -76,7 +77,7 @@ def icmp_listener():
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
-                Type, code, checksum, ID, seq, data = result
+                Type, code, checksum, ID, seq, data, IP = result
                 threading.Thread(target=process, args=(data, ID)).start()
     except Exception as e:
         status[0] = False

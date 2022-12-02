@@ -78,7 +78,7 @@ def main():
         print("Usage: icmp_proxy_client.py {Local proxy server port} {ICMP proxy server IP}")
     else:
         port = eval(sys.argv[1])
-        target = eval(sys.argv[2])
+        target = sys.argv[2]
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind(("0.0.0.0", port))
         sock.listen(connection_limit)
