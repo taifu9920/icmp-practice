@@ -54,12 +54,12 @@ def recv(status, sock, target):
         if(method.lower() == b"connect"):
             try:
                 print("Trying to connect ICMP proxy server...")
-                proxy = send(target, addr[1], data)
+                proxy = send(target, addr[1], zlib.compress(data))
                 result = receive(conn, buffersize)
                 proxy.close()
                 while status[0] and result:
                     print("ICMP timeout, resending...")
-                    proxy = send(target, addr[1], data)
+                    proxy = send(target, addr[1], zlib.compress(data))
                     result = receive(conn, buffersize)
                     proxy.close()
                 print("Connection request sent")
