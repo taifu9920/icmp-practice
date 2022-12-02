@@ -26,6 +26,7 @@ def icmp_forward(target):
         while not ping: 
             icmp = send(target, 0x0000, b"")
             ping = receive(icmp, buffersize)
+        print("Ping successful")
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
