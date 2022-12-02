@@ -13,7 +13,7 @@ def recv(status, last):
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
                 last[0] = IP
-                send(IP, ID, data + b' received') # Echo reply
+                send(IP, ID, data + b' received', 0) # Echo reply
                 data = data.decode("utf-8")
                 print("received:",data)
         icmp.close()
@@ -35,7 +35,7 @@ def main():
                 print("stop/exit - Stop and exit the server")
                 print("help - Show this helpful menu")
             elif last[0]:
-                send(last[0], 0x1234, cmd.encode())
+                send(last[0], 0x1234, cmd.encode(), 0)
             print(last[0])
         print("Server stopped")
     except Exception as e:
