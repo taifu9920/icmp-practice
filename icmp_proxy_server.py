@@ -17,6 +17,7 @@ def forward(conn, target, ID):
         raise e
 
 def process(IP, data, ID):
+    print(data)
     method = data[:data.find(b" ")]
     URL = data[data.find(b" ")+1:]
     version = data[data.find(b" ")+1:]
