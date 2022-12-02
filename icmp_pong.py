@@ -16,6 +16,7 @@ def recv(status, last):
                 send(IP, ID, data, 0) # Echo reply
                 data = data.decode("utf-8")
                 print("received:",data)
+            if last[0] != None: send(last[0], last[1], last[2], 0) # Echo reply
         icmp.close()
     except Exception as e:
         icmp.close()
