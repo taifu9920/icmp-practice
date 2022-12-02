@@ -24,7 +24,7 @@ def recv(status, last):
 def main():
     try:
         print(f"Fetching ping...")
-        threading.Thread(target=recv, args = (status,), daemon = True).start()
+        threading.Thread(target=recv, args = (status,last), daemon = True).start()
 
         while status[0]:
             cmd = input("Terminal# ").lower().strip()
