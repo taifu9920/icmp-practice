@@ -30,7 +30,7 @@ def icmp_forward(target, ID):
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
-            print(result)
+                print(result)
                 Type, code, checksum, ID, seq, data, IP = result
                 if TCPs.get(ID):
                     try:
