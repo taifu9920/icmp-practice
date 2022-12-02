@@ -62,7 +62,7 @@ def recv(status, sock, target):
                 print("Forward connection failed")
         else:
             try:
-                result = must_send(target, buffersize, addr[1], data)
+                result = must_send(target, buffersize,8, addr[1], data)
                 if result: print("Web request successful and released")
                 else: print("ICMP send failed")
             except Exception as e:

@@ -41,7 +41,7 @@ def process(IP, data, ID):
                 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 server.connect((hostname, port))
                 threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
-                result = must_send(IP, buffersize, 0, ID, f"HTTP/{version} 200 Connection Established".encode())
+                result = must_send(IP, buffersize, 8, ID, f"HTTP/{version} 200 Connection Established".encode(), 0)
                 if result: print("CONNECT method connection established")
             except Exception as e:
                 server.close()
@@ -54,7 +54,7 @@ def process(IP, data, ID):
                     proxy.connect((hostname, port))
                     proxy.send(data)
                     result = proxy.recv(buffersize)
-                    if result: must_send(IP, buffersize, 0, ID, result)
+                    if result: must_send(IP, buffersize, 8, ID, result, 0)
                     proxy.close()
                     print("Web request successful and released")
                 except Exception as e:
