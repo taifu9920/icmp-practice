@@ -12,12 +12,7 @@ def forward(conn, target, ID):
         while status[0]:
             data = conn.recv(buffersize)
             if data:
-                proxy = send(target, ID, data)
-                result = receive(conn)
-                while status[0] and result:
-                    print("ICMP timeout, resending...")
-                    proxy = send(target, ID, data)
-                    result = receive(conn)
+                proxy = mustsend(target, buffersize, 8 ID, data)
             else: break
     except Exception as e:
         raise e
@@ -46,8 +41,8 @@ def process(IP, data, ID):
                 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 server.connect((hostname, port))
                 threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
-                send(IP, ID, f"HTTP/{version} 200 Connection Established".encode())
-                print("CONNECT method connection established")
+                result = mustsend(IP, buffersize, 8, ID, f"HTTP/{version} 200 Connection Established".encode())
+                if result: print("CONNECT method connection established")
             except Exception as e:
                 server.close()
                 print("Forward connection failed")
@@ -59,7 +54,7 @@ def process(IP, data, ID):
                     proxy.connect((hostname, port))
                     proxy.send(data)
                     result = proxy.recv(buffersize)
-                    if result: send(IP, ID, result)
+                    if result: mustsend(IP, buffersize, 8, ID, result)
                     proxy.close()
                     print("Web request successful and released")
                 except Exception as e:
@@ -76,7 +71,7 @@ def icmp_listener():
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
                 print(ID, data)
-                send(IP, ID, data, 0)
+                send(IP, ID, data, 0) # echo reply
                 threading.Thread(target=process, args=(IP, data, ID)).start()
     except Exception as e:
         status[0] = False

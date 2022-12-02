@@ -34,3 +34,14 @@ def send(target, ID = 0x1234, data = b"", Type=8):
     packet = header + data
     sock.sendto(packet, (target, 1))
     return sock
+    
+def must_send(target, size, attempt_limit = 8, ID=0x1234, data=b"", Type=8):
+    conn = send(target, ID, data, Type)
+    result = receive(conn, size)
+    while attempt_limit > 0 and not result:
+        result = receive(conn, size)
+        attempt_limit -= 1
+    if attempt_limit == 0 and not result:
+        print("Failed to send ICMP!")
+    else: conn.close()
+    return result if attempt_limit > 0 and result else None

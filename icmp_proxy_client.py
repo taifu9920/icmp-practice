@@ -13,12 +13,7 @@ def forward(conn, target, ID):
         while status[0]:
             data = conn.recv(buffersize)
             if data:
-                proxy = send(target, ID, data)
-                result = receive(conn, buffersize)
-                while status[0] and result:
-                    print("ICMP timeout, resending...")
-                    proxy = send(target, ID, data)
-                    result = receive(conn, buffersize)
+                mustsend(target, buffersize, 8, ID, data)
             else: break
     except Exception as e:
         raise e
@@ -53,14 +48,7 @@ def recv(status, sock, target):
         if(method.lower() == b"connect"):
             try:
                 print("Trying to connect ICMP proxy server...")
-                proxy = send(target, addr[1], data)
-                result = receive(conn, buffersize)
-                proxy.close()
-                while status[0] and result:
-                    print("ICMP timeout, resending...")
-                    proxy = send(target, addr[1], data)
-                    result = receive(conn, buffersize)
-                    proxy.close()
+                result = mustsend(target, buffersize, 8, addr[1], data)
                 print("Connection request sent")
                 threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
             except Exception as e:
@@ -69,13 +57,9 @@ def recv(status, sock, target):
                 print("Forward connection failed")
         else:
             try:
-                proxy = send(target, addr[1], data)
-                result = receive(conn, buffersize)
-                if result:
-                    Type, code, checksum, addr[1], seq, data = result
-                    conn.send(data)
-                conn.close()
-                print("Web request successful and released")
+                result = mustsend(target, buffersize, addr[1], data)
+                if result: print("Web request successful and released")
+                else: print("ICMP send failed")
             except Exception as e:
                 conn.close()
                 print("Request connection failed")
