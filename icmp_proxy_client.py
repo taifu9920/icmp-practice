@@ -44,6 +44,7 @@ def icmp_forward(target):
         raise e
         
 def recv(status, sock, target):
+    #capture TCP and forward to ICMP
     while status[0]:
         conn, addr = sock.accept()
         print("Received a connection from",addr)
@@ -79,8 +80,7 @@ def main():
         sock.listen(connection_limit)
         print(f"Server is listening on {port}")
         print("Waiting for connections...")
-        receive = threading.Thread(target=recv, args = (status, sock, target), daemon = True)
-        receive.start()
+        threading.Thread(target=recv, args = (status, sock, target), daemon = True).start()
         #ICMP listener
         threading.Thread(target=icmp_forward, args=(target,), daemon = True).start()
         

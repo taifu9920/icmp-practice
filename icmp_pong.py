@@ -12,7 +12,7 @@ def recv(status, last):
             result = receive(icmp, 1024) # fetch feedback
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                last[0], last[1] = IP, ID
+                last[0], last[1] = IP, ID # IP and ID must be forward, and has to be Echo Reply
                 send(IP, ID, data + b' received', 0) # Echo reply
                 data = data.decode("utf-8")
                 print("received:",data)
