@@ -12,7 +12,7 @@ def forward(conn, target, ID):
         while status[0]:
             data = conn.recv(buffersize)
             if data:
-                proxy = mustsend(target, buffersize, 8 ID, data)
+                proxy = mustsend(target, buffersize, 8, ID, data)
             else: break
     except Exception as e:
         raise e
