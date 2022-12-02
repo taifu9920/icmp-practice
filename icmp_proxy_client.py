@@ -13,7 +13,7 @@ def forward(conn, target, ID):
         while status[0]:
             data = conn.recv(buffersize)
             if data:
-                mustsend(target, buffersize, 8, ID, data)
+                must_send(target, buffersize, 8, ID, data)
             else: break
     except Exception as e:
         raise e
@@ -48,7 +48,7 @@ def recv(status, sock, target):
         if(method.lower() == b"connect"):
             try:
                 print("Trying to connect ICMP proxy server...")
-                result = mustsend(target, buffersize, 8, addr[1], data)
+                result = must_send(target, buffersize, 8, addr[1], data)
                 print("Connection request sent")
                 threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
             except Exception as e:
@@ -57,7 +57,7 @@ def recv(status, sock, target):
                 print("Forward connection failed")
         else:
             try:
-                result = mustsend(target, buffersize, addr[1], data)
+                result = must_send(target, buffersize, addr[1], data)
                 if result: print("Web request successful and released")
                 else: print("ICMP send failed")
             except Exception as e:
