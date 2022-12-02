@@ -23,6 +23,11 @@ def main():
                     Type, code, checksum, ID, seq, data, addr = result
                     data = data.decode("utf-8")
                     print(data)
+                result = receive(conn, 1024) # fetch feedback
+                if result:
+                    Type, code, checksum, ID, seq, data, addr = result
+                    data = data.decode("utf-8")
+                    print(data)
                 else: print("Timeout!")
                 conn.close()
             except Exception as e:
