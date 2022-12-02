@@ -35,7 +35,7 @@ def main():
                 print("stop/exit - Stop and exit the server")
                 print("help - Show this helpful menu")
             elif last[0]:
-                send(last[0], 0x1234, cmd)
+                send(last[0], 0x1234, cmd.encode())
         print("Server stopped")
     except Exception as e:
         raise(e)
