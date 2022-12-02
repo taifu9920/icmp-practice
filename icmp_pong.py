@@ -10,6 +10,7 @@ def main():
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
                 send(IP, ID, data, 0) # Echo reply
+                send(IP, ID, data, 0) # Echo reply
                 data = data.decode("utf-8")
                 print(data)
         icmp.close()
