@@ -1,4 +1,4 @@
-import select, struct, socket, sys
+import select, struct, socket, sys, zlib
 
 def get_checksum(packet):
     checksum = 0
@@ -18,10 +18,11 @@ def receive(sock, size):
     if pending[0]:
         recv_packet, addr = sock.recvfrom(size)
         Type, code, checksum, ID, seq = struct.unpack("bbHHh", recv_packet[20:28])
-        return Type, code, checksum, ID, seq, recv_packet[28:], addr[0]
+        return Type, code, checksum, ID, seq, zlib.decompress(recv_packet[28:]), addr[0]
     return None
     
 def send(target, ID = 0x1234, data = b""):
+    data = zlib.compress(data)
     while len(data) < 18 or len(data) % 2 != 0: data += b" " # padding
     sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
     header = struct.pack("bbHHh", 8, 0, 0, ID, 1)

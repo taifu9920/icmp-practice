@@ -1,4 +1,4 @@
-import socket, threading, sys, ssl, zlib
+import socket, threading, sys, ssl
 from src.icmp import *
 
 connection_limit = 5 # non-accepted connections limit
@@ -13,7 +13,6 @@ def forward(conn, target, ID):
         while status[0]:
             data = conn.recv(buffersize)
             if data:
-                data = zlib.compress(data)
                 proxy = send(target, ID, data)
                 result = receive(conn, buffersize)
                 while status[0] and result:
@@ -54,12 +53,12 @@ def recv(status, sock, target):
         if(method.lower() == b"connect"):
             try:
                 print("Trying to connect ICMP proxy server...")
-                proxy = send(target, addr[1], zlib.compress(data))
+                proxy = send(target, addr[1], data)
                 result = receive(conn, buffersize)
                 proxy.close()
                 while status[0] and result:
                     print("ICMP timeout, resending...")
-                    proxy = send(target, addr[1], zlib.compress(data))
+                    proxy = send(target, addr[1], data)
                     result = receive(conn, buffersize)
                     proxy.close()
                 print("Connection request sent")
@@ -70,11 +69,11 @@ def recv(status, sock, target):
                 print("Forward connection failed")
         else:
             try:
-                proxy = send(target, addr[1], zlib.compress(data))
+                proxy = send(target, addr[1], data)
                 result = receive(conn, buffersize)
                 if result:
                     Type, code, checksum, addr[1], seq, data = result
-                    conn.send(zlib.decompress(data))
+                    conn.send(data)
                 conn.close()
                 print("Web request successful and released")
             except Exception as e:

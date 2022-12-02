@@ -1,4 +1,4 @@
-import socket, threading, sys, ssl, zlib
+import socket, threading, sys, ssl
 from src.icmp import *
 
 status = [True]
@@ -12,7 +12,6 @@ def forward(conn, target, ID):
         while status[0]:
             data = conn.recv(buffersize)
             if data:
-                data = zlib.compress(data)
                 proxy = send(target, ID, data)
                 result = receive(conn)
                 while status[0] and result:
@@ -24,7 +23,6 @@ def forward(conn, target, ID):
         raise e
 
 def process(IP, data, ID):
-    data = zlib.decompress(data)
     method = data[:data.find(b" ")]
     URL = data[data.find(b" ")+1:]
     version = data[data.find(b" ")+1:]
@@ -48,7 +46,7 @@ def process(IP, data, ID):
                 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 server.connect((hostname, port))
                 threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
-                send(IP, ID, zlib.compress(f"HTTP/{version} 200 Connection Established".encode()))
+                send(IP, ID, f"HTTP/{version} 200 Connection Established".encode())
                 print("CONNECT method connection established")
             except Exception as e:
                 server.close()
