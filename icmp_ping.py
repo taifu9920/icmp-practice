@@ -19,7 +19,10 @@ def main():
                 print(f"Pinging {target}...")
                 conn = send(target, 0x1234, cmd.encode()) # send ping
                 result = receive(conn, 1024) # fetch feedback
-                if result: print("data sent!")
+                if result:
+                    Type, code, checksum, ID, seq, data, addr = result
+                    data = data.decode("utf-8")
+                    print(data)
                 else: print("Timeout!")
                 conn.close()
             except Exception as e:

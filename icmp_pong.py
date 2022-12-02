@@ -13,7 +13,7 @@ def recv(status, last):
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
                 last[0] = IP
-                send(IP, ID, data + b' received', 0) # Echo reply
+                send(IP, ID, data + b' received') # Echo reply
                 data = data.decode("utf-8")
                 print("received:",data)
         icmp.close()
