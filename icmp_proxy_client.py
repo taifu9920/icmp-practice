@@ -15,11 +15,11 @@ def forward(conn, target, ID):
             if data:
                 data = zlib.compress(data)
                 proxy = send(target, ID, data)
-                result = receive(conn)
+                result = receive(conn, buffersize)
                 while status[0] and result:
                     print("ICMP timeout, resending...")
                     proxy = send(target, ID, data)
-                    result = receive(conn)
+                    result = receive(conn, buffersize)
             else: break
     except Exception as e:
         raise e
@@ -53,15 +53,17 @@ def recv(status, sock, target):
         method = data[:data.find(b" ")]
         if(method.lower() == b"connect"):
             try:
-                threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
                 print("Trying to connect ICMP proxy server...")
-                proxy = send(target, ID, data)
-                result = receive(conn)
+                proxy = send(target, addr[1], data)
+                result = receive(conn, buffersize)
+                proxy.close()
                 while status[0] and result:
                     print("ICMP timeout, resending...")
-                    proxy = send(target, ID, data)
-                    result = receive(conn)
+                    proxy = send(target, addr[1], data)
+                    result = receive(conn, buffersize)
+                    proxy.close()
                 print("Connection request sent")
+                threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
             except Exception as e:
                 del TCPs[addr[1]]
                 conn.close()
@@ -69,15 +71,15 @@ def recv(status, sock, target):
         else:
             try:
                 proxy = send(target, addr[1], zlib.compress(data))
-                result = receive(conn)
+                result = receive(conn, buffersize)
                 if result:
-                    Type, code, checksum, ID, seq, data = result
+                    Type, code, checksum, addr[1], seq, data = result
                     conn.send(zlib.decompress(data))
                 conn.close()
                 print("Web request successful and released")
             except Exception as e:
                 conn.close()
-                print("Request onnection failed")
+                print("Request connection failed")
 
 def main():
     if len(sys.argv) < 3:
