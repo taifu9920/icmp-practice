@@ -73,7 +73,7 @@ def icmp_listener():
                 print(ID, data)
                 send(IP, ID, data, 0) # echo reply
                 if data == b"":
-                    must_send(IP, buffersize, 0, ID, b"Heya!")
+                    send(IP, ID, b"Heya!", 0)
                 if data: threading.Thread(target=process, args=(IP, data, ID)).start()
     except Exception as e:
         status[0] = False
