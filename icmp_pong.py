@@ -2,7 +2,7 @@ from src.icmp import *
 import socket, threading
 status = [True]
 buffersize = 2**16
-last = [None, None, None]
+last = [None]
 
 def recv(status, last):
     try:
@@ -12,11 +12,10 @@ def recv(status, last):
             result = receive(icmp, 1024) # fetch feedback
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                last[0], last[1], last[2] = IP, ID, data
+                last[0] = IP
                 send(IP, ID, data, 0) # Echo reply
                 data = data.decode("utf-8")
                 print("received:",data)
-            if last[0] != None: send(last[0], last[1], last[2], 8) # Echo reply
         icmp.close()
     except Exception as e:
         icmp.close()
@@ -36,7 +35,7 @@ def main():
                 print("stop/exit - Stop and exit the server")
                 print("help - Show this helpful menu")
             elif last[0]:
-                send(last[0], last[1], last[2], 0)
+                send(last[0], 0x1234, cmd.encode())
         print("Server stopped")
     except Exception as e:
         raise(e)
