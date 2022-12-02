@@ -9,9 +9,9 @@ def main():
         try:
             print(f"Pinging {i}...")
             conn = send(i, 0x1234, b"Hello world") # send ping
-            result = receive(conn) # fetch feedback
+            result = receive(conn, 1024) # fetch feedback
             if result:
-                Type, code, checksum, ID, seq, data = result
+                Type, code, checksum, ID, seq, data, IP = result
                 data = data.decode("utf-8")
                 print(data)
             else: print("Timeout!")

@@ -20,9 +20,7 @@ def recv(status, sock):
         conn, addr = sock.accept()
         print("Received a connection from",addr)
         data = conn.recv(buffersize)
-        #print(data)
         method = data[:data.find(b" ")]
-        #print(method)
         URL = data[data.find(b" ")+1:]
         version = data[data.find(b" ")+1:]
         version = version[version.find(b"HTTP/")+5:]
@@ -39,7 +37,6 @@ def recv(status, sock):
         elif URL.startswith(b"https://"): port = 443
         else: port = 80
         path = b"/"
-        #print(hostname, port)
         if hostname and port:
             if(method.lower() == b"connect"):
                 try:

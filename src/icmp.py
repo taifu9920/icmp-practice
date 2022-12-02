@@ -12,13 +12,13 @@ def get_checksum(packet):
     answer = ~checksum & 0xffff
     return answer >> 8 | (answer << 8 & 0xff00)
 
-def receive(sock):
+def receive(sock, size):
     timeout = 2
     pending = select.select([sock], [], [], timeout)
     if pending[0]:
-        recv_packet, addr = sock.recvfrom(1024)
+        recv_packet, addr = sock.recvfrom(size)
         Type, code, checksum, ID, seq = struct.unpack("bbHHh", recv_packet[20:28])
-        return Type, code, checksum, ID, seq, recv_packet[28:]
+        return Type, code, checksum, ID, seq, recv_packet[28:], addr[0]
     return None
     
 def send(target, ID = 0x1234, data = b""):

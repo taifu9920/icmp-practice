@@ -4,37 +4,46 @@ from src.icmp import *
 connection_limit = 5 # non-accepted connections limit
 status = [True]
 buffersize = 2**16
+TCPs = dict()
 
-def forward(conn, target):
+def forward(conn, target, ID):
     #TCP to ICMP
+    TCPs[ID] = conn
     try:
         while status[0]:
             data = conn.recv(buffersize)
             if data:
                 data = zlib.compress(data)
-                proxy = send(target, 0x1234, data)
+                proxy = send(target, ID, data)
                 result = receive(conn)
                 while status[0] and result:
                     print("ICMP timeout, resending...")
-                    proxy = send(target, 0x1234, data)
+                    proxy = send(target, ID, data)
                     result = receive(conn)
             else: break
     except Exception as e:
         raise e
 
-def icmp_forward(target, conn):#WIP
+def icmp_forward():
     #ICMP to TCP
     try:
-        socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
-        sock.bind(("0.0.0.0", 0))
+        icmp = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
+        icmp.bind(("0.0.0.0", 0))
         while status[0]:
-            sock.recvfrom(2048)
-            data = conn1.recv(buffersize)
-            if data: conn2.send(data)
-            else: break
-        sock.close()
+            result = receive(icmp, buffersize)
+            if result:
+                Type, code, checksum, ID, seq, data, IP = result
+                print(data)
+                if TCPs.get(ID):
+                    try:
+                        TCPs[ID].send(data)
+                    except Exception as e:
+                        TCPs[ID].close()
+                        del TCPs[ID]
     except Exception as e:
-        sock.close()
+        status[0] = False
+        print("Error on ICMP forwarding!")
+        raise e
         
 def recv(status, sock, target):
     while status[0]:
@@ -44,17 +53,17 @@ def recv(status, sock, target):
         method = data[:data.find(b" ")]
         if(method.lower() == b"connect"):
             try:
-                threading.Thread(target=icmp_forward, args=(target, conn), daemon = True).start()
-                threading.Thread(target=forward, args=(conn,target), daemon = True).start()
+                threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
                 conn.send(f"HTTP/{version} 200 Connection Established".encode())
                 print("CONNECT method connection established")
             except Exception as e:
+                del TCPs[addr[1]]
                 conn.close()
                 print("Forward connection failed")
         else:
             try:
-                proxy = send(target, 0x1234, zlib.compress(data)) # send ping
-                result = receive(conn) # fetch feedback
+                proxy = send(target, addr[1], zlib.compress(data))
+                result = receive(conn)
                 if result:
                     Type, code, checksum, ID, seq, data = result
                     conn.send(zlib.decompress(data))
@@ -66,7 +75,7 @@ def recv(status, sock, target):
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: proxy_server.py {The Port you wanted} {ICMP PROXY SERVER IP}")
+        print("Usage: icmp_proxy_client.py {Local proxy server port} {ICMP proxy server IP}")
     else:
         port = eval(sys.argv[1])
         target = eval(sys.argv[2])
@@ -77,6 +86,9 @@ def main():
         print("Waiting for connections...")
         receive = threading.Thread(target=recv, args = (status, sock, target), daemon = True)
         receive.start()
+        #ICMP listener
+        threading.Thread(target=icmp_forward, daemon = True).start()
+        
         while status[0]:
             cmd = input("Terminal# ").lower().strip()
             if cmd == "stop" or cmd == "exit":
