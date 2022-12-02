@@ -8,8 +8,8 @@ def main():
         while 1:
             result = receive(icmp, 1024) # fetch feedback
             if result:
-                Type, code, checksum, ID, seq, data, addr = result
-                send(addr[0], ID, data, 0) # Echo reply
+                Type, code, checksum, ID, seq, data, IP = result
+                send(IP, ID, data, 0) # Echo reply
                 data = data.decode("utf-8")
                 print(data)
         icmp.close()
