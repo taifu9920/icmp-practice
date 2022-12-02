@@ -21,13 +21,11 @@ def forward(conn, target, ID):
 def icmp_forward(target):
     #ICMP to TCP
     try:
-        icmp = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
-        icmp.bind(("0.0.0.0", 0))
-        ping = must_send(target, buffersize, 8, 0x0000, b"")
-        if not ping: 
-            print("Ping failed!")
-            return None
-        else: print("Pong received!")
+        icmp = send(target, 0x0000, b"")
+        ping = receive(icmp, buffersize)
+        while not ping: 
+            icmp = send(target, 0x0000, b"")
+            ping = receive(icmp, buffersize)
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
