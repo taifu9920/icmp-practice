@@ -23,7 +23,10 @@ def icmp_forward(target):
     try:
         icmp = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
         icmp.bind(("0.0.0.0", 0))
-        must_send(target, buffersize, 8, 0x0000, b"")
+        ping = must_send(target, buffersize, 8, 0x0000, b"")
+        if not ping: 
+            print("Ping failed!")
+            return None
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
