@@ -53,6 +53,7 @@ def process(IP, data, ID):
                     proxy.connect((hostname, port))
                     proxy.send(data)
                     result = proxy.recv(buffersize)
+                    print(result)
                     if result: send(IP, ID, result, 0)
                     proxy.close()
                     print("Web request successful and released")
