@@ -54,8 +54,14 @@ def recv(status, sock, target):
         if(method.lower() == b"connect"):
             try:
                 threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
-                conn.send(f"HTTP/{version} 200 Connection Established".encode())
-                print("CONNECT method connection established")
+                print("Trying to connect ICMP proxy server...")
+                proxy = send(target, ID, data)
+                result = receive(conn)
+                while status[0] and result:
+                    print("ICMP timeout, resending...")
+                    proxy = send(target, ID, data)
+                    result = receive(conn)
+                print("Connection request sent")
             except Exception as e:
                 del TCPs[addr[1]]
                 conn.close()
