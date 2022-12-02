@@ -76,8 +76,8 @@ def icmp_listener():
             if result:
                 Type, code, checksum, ID, seq, data, addr = result
                 print(ID, data)
-                send(":".join(addr))
-                threading.Thread(target=process, args=(":".join(addr), data, ID)).start()
+                send(f"{addr[0]}:{addr[1]}", ID, data)
+                threading.Thread(target=process, args=(f"{addr[0]}:{addr[1]}", data, ID)).start()
     except Exception as e:
         status[0] = False
         print("Error on ICMP forwarding!")
