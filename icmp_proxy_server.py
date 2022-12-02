@@ -12,7 +12,7 @@ def forward(conn, target, ID):
         while status[0]:
             data = conn.recv(buffersize)
             if data:
-                proxy = must_send(target, buffersize, 0, ID, data)
+                proxy = send(target, ID, data, 0)
             else: break
     except Exception as e:
         raise e
@@ -69,7 +69,6 @@ def icmp_listener():
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                print(result)
                 send(IP, ID, data, 0) # echo reply
                 if data: threading.Thread(target=process, args=(IP, data, ID)).start()
     except Exception as e:
