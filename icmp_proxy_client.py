@@ -29,8 +29,8 @@ def icmp_forward(target, ID):
         print("Ping successful")
         while status[0]:
             result = receive(icmp, buffersize)
-            print(result)
             if result:
+            print(result)
                 Type, code, checksum, ID, seq, data, IP = result
                 if TCPs.get(ID):
                     try:
