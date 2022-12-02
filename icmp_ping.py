@@ -15,6 +15,7 @@ def main():
                 data = data.decode("utf-8")
                 print(data)
             else: print("Timeout!")
+            conn.close()
         except Exception as e:
             raise(e)
 

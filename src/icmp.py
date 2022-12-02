@@ -23,7 +23,7 @@ def receive(sock):
     
 def send(target, ID = 0x1234, data = b""):
     while len(data) < 18 or len(data) % 2 != 0: data += b" " # padding
-    sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.getprotobyname("icmp"))
+    sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
     header = struct.pack("bbHHh", 8, 0, 0, ID, 1)
     # htons() will convert decimal into network formatting
     # (BE & LE problem)

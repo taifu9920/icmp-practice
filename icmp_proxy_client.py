@@ -25,12 +25,16 @@ def forward(conn, target):
 def icmp_forward(target, conn):#WIP
     #ICMP to TCP
     try:
+        socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
+        sock.bind(("0.0.0.0", 0))
         while status[0]:
+            sock.recvfrom(2048)
             data = conn1.recv(buffersize)
             if data: conn2.send(data)
             else: break
+        sock.close()
     except Exception as e:
-        raise e
+        sock.close()
         
 def recv(status, sock, target):
     while status[0]:
