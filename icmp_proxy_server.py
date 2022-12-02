@@ -48,11 +48,10 @@ def process(IP, data, ID):
                 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 server.connect((hostname, port))
                 threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
-                conn.send(f"HTTP/{version} 200 Connection Established".encode())
+                send(IP, ID, zlib.compress(f"HTTP/{version} 200 Connection Established".encode()))
                 print("CONNECT method connection established")
             except Exception as e:
                 server.close()
-                conn.close()
                 print("Forward connection failed")
         else:
             if TCPs.get(ID): TCPs[ID].send(data)
@@ -78,6 +77,7 @@ def icmp_listener():
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
+                print(ID, result)
                 threading.Thread(target=process, args=(data, ID)).start()
     except Exception as e:
         status[0] = False
