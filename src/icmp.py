@@ -18,6 +18,7 @@ def receive(sock, size):
     if pending[0]:
         recv_packet, addr = sock.recvfrom(size)
         Type, code, checksum, ID, seq = struct.unpack("bbHHh", recv_packet[20:28])
+        print("Size:", len(recv_packet[28:]))
         return Type, code, checksum, ID, seq, zlib.decompress(recv_packet[28:].rstrip()), addr[0]
     return None
     
