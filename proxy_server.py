@@ -5,6 +5,7 @@ status = [True]
 buffersize = 2**16
 
 def forward(conn1, conn2):
+    #TCP to TCP
     try:
         while status[0]:
             data = conn1.recv(buffersize)
