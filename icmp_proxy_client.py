@@ -52,10 +52,10 @@ def recv(status, sock, target):
         method = data[:data.find(b" ")]
         if(method.lower() == b"connect"):
             try:
+                threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
                 print("Trying to connect ICMP proxy server...")
                 result = must_send(target, buffersize, 8, addr[1], data)
                 print("Connection request sent")
-                threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
             except Exception as e:
                 del TCPs[addr[1]]
                 conn.close()
