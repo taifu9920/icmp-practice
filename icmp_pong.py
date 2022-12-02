@@ -5,11 +5,11 @@ def main():
     icmp.bind(("0.0.0.0", 0))
     try:
         print(f"Fetching ping...")
+        send("36.239.128.236", 4460, b"Hello World", 0) # Echo reply
         while 1:
             result = receive(icmp, 1024) # fetch feedback
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                print(IP, ID, data)
                 send(IP, ID, data, 0) # Echo reply
                 data = data.decode("utf-8")
                 print(data)
