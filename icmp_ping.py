@@ -10,7 +10,6 @@ def main():
             print(f"Pinging {i}...")
             conn = send(i, 0x1234, b"Hello world") # send ping
             result = receive(conn, 1024) # fetch feedback
-            result = receive(conn, 1024) # fetch feedback
             if result:
                 Type, code, checksum, ID, seq, data, addr = result
                 data = data.decode("utf-8")

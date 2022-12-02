@@ -9,7 +9,7 @@ def main():
             result = receive(icmp, 1024) # fetch feedback
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                send(IP, ID, data, 0) # Echo reply
+                print(IP, ID, data)
                 send(IP, ID, data, 0) # Echo reply
                 data = data.decode("utf-8")
                 print(data)
