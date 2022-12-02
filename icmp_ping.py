@@ -1,6 +1,6 @@
 from src.icmp import *
 
-default_target = "36.239.132.46"
+default_target = "rmh.i234.me"
 
 def main():
     if (len(sys.argv) < 2): target = [default_target]
@@ -8,7 +8,7 @@ def main():
     for i in target:
         try:
             print(f"Pinging {i}...")
-            conn = send(i, 0x1234, "Hello world") # send ping
+            conn = send(i, 0x1234, b"Hello world") # send ping
             result = receive(conn) # fetch feedback
             if result:
                 Type, code, checksum, ID, seq, data = result

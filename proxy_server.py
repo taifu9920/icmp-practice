@@ -1,20 +1,72 @@
-import socket, threading, sys
+import socket, threading, sys, ssl
 
-connection_limit = 5
+connection_limit = 5 # non-accepted connections limit
 status = [True]
 buffersize = 2**16
 
-def proxy(status, conn, addr):
-    data = conn.recv(buffersize)
-    print(data)
-    while status[0]:
-        "WIP"
+def forward(conn1, conn2):
+    try:
+        while status[0]:
+            data = conn1.recv(buffersize)
+            if data: conn2.send(data)
+            else: break
+    except Exception as e:
+        raise e
+    
 
 def recv(status, sock):
     while status[0]:
         conn, addr = sock.accept()
-        thread = threading.Thread(target=proxy, args=(status,conn, addr), daemon=True)
-        thread.start()
+        print("Received a connection from",addr)
+        data = conn.recv(buffersize)
+        #print(data)
+        method = data[:data.find(b" ")]
+        #print(method)
+        URL = data[data.find(b" ")+1:]
+        version = data[data.find(b" ")+1:]
+        version = version[version.find(b"HTTP/")+5:]
+        version = version[:version.find(b"\r\n")]
+        URL = URL[:URL.find(b" ")]
+        if (URL.startswith(b"http")):
+            hostname = URL[URL.find(b"://")+3:]
+            hostname = hostname[:hostname.find(b"/")]
+        else: 
+            hostname = URL
+        if hostname.find(b":") != -1:
+            port = eval(hostname[hostname.find(b":")+1:])
+            hostname = hostname[:hostname.find(b":")]
+        elif URL.startswith(b"https://"): port = 443
+        else: port = 80
+        path = b"/"
+        #print(hostname, port)
+        if hostname and port:
+            if(method.lower() == b"connect"):
+                try:
+                    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    server.connect((hostname, port))
+                    threading.Thread(target=forward, args=(conn,server), daemon = True).start()
+                    threading.Thread(target=forward, args=(server,conn), daemon = True).start()
+                    conn.send(f"HTTP/{version} 200 Connection Established".encode())
+                    print("CONNECT method connection established")
+                except Exception as e:
+                    server.close()
+                    conn.close()
+                    print("Forward connection failed")
+            else:
+                try:
+                    proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    proxy.connect((hostname, port))
+                    proxy.send(data)
+                    result = proxy.recv(buffersize)
+                    #print(result)
+                    if result: conn.send(result)
+                    proxy.close()
+                    conn.close()
+                    print("Web request successful and released")
+                except Exception as e:
+                    proxy.close()
+                    conn.close()
+                    print("Request onnection failed")
 
 def main():
     if len(sys.argv) < 2:

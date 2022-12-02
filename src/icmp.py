@@ -21,9 +21,8 @@ def receive(sock):
         return Type, code, checksum, ID, seq, recv_packet[28:]
     return None
     
-def send(target, ID = 0x1234, data = ""):
-    while len(data) < 18 or len(data) % 2 != 0: data += " " # padding
-    data = data.encode("utf-8")
+def send(target, ID = 0x1234, data = b""):
+    while len(data) < 18 or len(data) % 2 != 0: data += b" " # padding
     sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.getprotobyname("icmp"))
     header = struct.pack("bbHHh", 8, 0, 0, ID, 1)
     # htons() will convert decimal into network formatting
