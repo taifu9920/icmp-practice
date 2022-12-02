@@ -18,11 +18,12 @@ def forward(conn, target, ID):
     except Exception as e:
         raise e
 
-def icmp_forward():
+def icmp_forward(target):
     #ICMP to TCP
     try:
         icmp = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
         icmp.bind(("0.0.0.0", 0))
+        mustsend(target, buffersize, 8, 0x0000, b"Connection check")
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
@@ -78,7 +79,7 @@ def main():
         receive = threading.Thread(target=recv, args = (status, sock, target), daemon = True)
         receive.start()
         #ICMP listener
-        threading.Thread(target=icmp_forward, daemon = True).start()
+        threading.Thread(target=icmp_forward, args=(target,), daemon = True).start()
         
         while status[0]:
             cmd = input("Terminal# ").lower().strip()
