@@ -31,6 +31,7 @@ def icmp_forward(target, ID):
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
                 print(ID, data)
+                print(TCPs)
                 if data and ID in TCPs:
                     try:
                         TCPs[ID].send(data)
