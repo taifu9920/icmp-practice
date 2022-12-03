@@ -32,6 +32,7 @@ def icmp_forward(target, ID, data):
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
+                print(data[:9])
                 if data[:9] != "echoreply":
                     if data:
                         if ID in TCPs:
