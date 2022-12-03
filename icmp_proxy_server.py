@@ -43,9 +43,10 @@ def process(IP, data, ID):
                 try:
                     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     server.connect((hostname, port))
-                    TCPs[ID] = conn
+                    TCPs[ID] = server
                     threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
                     send(IP, ID, f"HTTP/{version} 200 Connection Established".encode(), 0)
+                    print("HTTPS connection request received")
                 except Exception as e:
                     server.close()
                     print("Forward connection failed")
