@@ -21,7 +21,7 @@ def forward(conn, target, ID):
 def icmp_forward(target, ID, data):
     #ICMP to TCP
     try:
-        print(data)
+        #print(data)
         icmp = send(target, ID, data)
         while status[0]:
             result = receive(icmp, buffersize)
