@@ -66,7 +66,7 @@ def process(IP, data, ID):
                         proxy.close()
                         print("Request connection failed")
                         raise e
-        except TypeError:
+        except Exception as e:
             now = time.time()
             while ID not in TCPs and time.time() - now < 20:
                 time.sleep(1)
