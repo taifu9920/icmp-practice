@@ -1,4 +1,4 @@
-import socket, threading, sys, ssl
+import socket, threading, sys, ssl, select
 
 connection_limit = 5 # non-accepted connections limit
 status = [True]
