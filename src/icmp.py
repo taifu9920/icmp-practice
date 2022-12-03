@@ -34,7 +34,7 @@ def send(target, ID = 0x1234, data = b"", Type=8):
     sock.sendto(packet, (target, 1))
     return sock
     
-def must_send(target, size, attempt_limit = 8, ID=0x1234, data=b"", Type=8):
+def must_send(target, size, attempt_limit = 8, ID=0x1234, data=b"", Type=8, secondResult=False):
     conn = send(target, ID, data, Type)
     result = receive(conn, size)
     while attempt_limit > 0 and not result:
@@ -42,4 +42,9 @@ def must_send(target, size, attempt_limit = 8, ID=0x1234, data=b"", Type=8):
         attempt_limit -= 1
     if attempt_limit == 0 and not result:
         print("Failed to send ICMP!")
+    else:
+        print("Receive successful!")
+        if secondResult: result = receive(conn, size)
+        if result: print("Second receive successful!")
+        else: print("Second receive failed!")
     return result if attempt_limit > 0 and result else None

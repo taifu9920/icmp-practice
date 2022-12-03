@@ -13,7 +13,7 @@ def forward(conn, target, ID):
         while status[0]:
             data = conn.recv(buffersize)
             if data:
-                must_send(target, buffersize, 8, ID, data)
+                send(target, ID, data)
             else: break
     except Exception as e:
         raise e
@@ -30,8 +30,8 @@ def icmp_forward(target, ID):
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
-                print(result)
                 Type, code, checksum, ID, seq, data, IP = result
+                print(ID, TCPs)
                 if TCPs.get(ID):
                     try:
                         TCPs[ID].send(data)
@@ -42,33 +42,40 @@ def icmp_forward(target, ID):
         status[0] = False
         print("Error on ICMP forwarding!")
         raise e
-        
+
+def process(conn, ID, target):
+    data = conn.recv(buffersize)
+    method = data[:data.find(b" ")]
+    if(method.lower() == b"connect"):
+        try:
+            threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
+            threading.Thread(target=icmp_forward, args=(target,addr[1]), daemon = True).start()
+            print("Trying to connect ICMP proxy server...")
+            result = must_send(target, buffersize, 8, addr[1], data)
+            if result: print("ICMP connect request sent")
+            else: print("Failed to send icmp connect data")
+        except Exception as e:
+            del TCPs[addr[1]]
+            conn.close()
+            print("Forward connection failed")
+    else:
+        try:
+            result = must_send(target, buffersize,8, addr[1], data, 8, True)
+            Type, code, checksum, ID, seq, data, IP = result
+            conn.send(result)
+            if result: print("Web request successful")
+            else: print("Web request failed")
+        except Exception as e:
+            conn.close()
+            print("Request connection failed")
+    
+
 def recv(status, sock, target):
     #capture TCP and forward to ICMP
     while status[0]:
         conn, addr = sock.accept()
         print("Received a connection from",addr)
-        data = conn.recv(buffersize)
-        method = data[:data.find(b" ")]
-        if(method.lower() == b"connect"):
-            try:
-                threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
-                threading.Thread(target=icmp_forward, args=(target,addr[1]), daemon = True).start()
-                print("Trying to connect ICMP proxy server...")
-                result = must_send(target, buffersize, 8, addr[1], data)
-                print("Connection request sent")
-            except Exception as e:
-                del TCPs[addr[1]]
-                conn.close()
-                print("Forward connection failed")
-        else:
-            try:
-                result = must_send(target, buffersize,8, addr[1], data)
-                if result: print("Web request successful and released")
-                else: print("ICMP send failed")
-            except Exception as e:
-                conn.close()
-                print("Request connection failed")
+        threading.Thread(target=process, args=(conn, addr[1], target), daemon=True).start()
 
 def main():
     if len(sys.argv) < 3:
