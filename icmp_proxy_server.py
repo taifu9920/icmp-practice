@@ -25,7 +25,7 @@ def icmp_listener():
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                send(IP, ID, data, 0) # echo reply
+                #send(IP, ID, data, 0) # echo reply
                 if data:
                     if ID in TCPs: 
                         print("sending", data, "to web request ID", ID)

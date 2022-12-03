@@ -11,7 +11,9 @@ def forward(conn, target, ID):
     try:
         while status[0]:
             data = conn.recv(buffersize)
-            if data: must_send(target,buffersize, 8, ID, data)
+            if data: 
+                print("sending ICMP data", data, "to server with ID", ID)
+                send(target, ID, data)
             else: break
     except Exception as e:
         "Ignored"
@@ -56,7 +58,7 @@ def process(conn, ID, target):
             print("Forward connection failed")
     else:
         try:
-            result = must_send(target, buffersize,8, ID, data, 8, True)
+            result = must_send(target, buffersize,8, ID, data, 8)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
                 conn.send(data)
