@@ -66,7 +66,7 @@ def process(conn, ID, target):
             print("Forward connection failed")
     else:
         try:
-            result = must_send(target, buffersize,8, ID, data, 8)
+            result = must_send(target, buffersize,8, ID, data, 8, True)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
                 conn.send(data)
