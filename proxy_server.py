@@ -54,9 +54,10 @@ def recv(status, sock):
                 try:
                     proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     proxy.connect((hostname, port))
-                    proxy.send(data + b"\x00")
+                    proxy.send(data)
                     while 1:
                         result = proxy.recv(buffersize)
+                        print(result)
                         if result: conn.send(result)
                         else: break
                     proxy.close()
