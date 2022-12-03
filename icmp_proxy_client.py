@@ -48,31 +48,14 @@ def icmp_forward(target, ID, data):
 def process(conn, ID, target):
     data = conn.recv(buffersize)
     method = data[:data.find(b" ")]
-    print(data)
-    if(method.lower() == b"connect"):
-        try:
-            TCPs[ID] = conn
-            threading.Thread(target=forward, args=(conn, target, ID), daemon = True).start()
-            threading.Thread(target=icmp_forward, args=(target,ID, data), daemon = True).start()
-        except Exception as e:
-            if ID in TCPs: del TCPs[ID]
-            conn.close()
-            raise e
-            print("Forward connection failed")
-    else:
-        try:
-            result = must_send(target, buffersize,8, ID, data, 8, True)
-            if result:
-                Type, code, checksum, ID, seq, data, IP = result
-                conn.send(data)
-                #print("Web request successful")
-            else:
-                #print("Web request failed")
-                conn.close()
-        except Exception as e:
-            conn.close()
-            #print("Request connection failed")
-            #raise e
+    try:
+        TCPs[ID] = conn
+        threading.Thread(target=forward, args=(conn, target, ID), daemon = True).start()
+        threading.Thread(target=icmp_forward, args=(target,ID, data), daemon = True).start()
+    except Exception as e:
+        if ID in TCPs: del TCPs[ID]
+        conn.close()
+        print("Forward connection failed")
 
 def recv(status, sock, target):
     #capture TCP and forward to ICMP
