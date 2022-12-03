@@ -18,7 +18,7 @@ def receive(sock, size):
     if pending[0]:
         recv_packet, addr = sock.recvfrom(size)
         Type, code, checksum, ID, seq = struct.unpack("bbHHh", recv_packet[20:28])
-        return Type, code, checksum, ID, seq, zlib.decompress(recv_packet[28:].rstrip(b"\x00"))[:-4], addr[0]
+        return Type, code, checksum, ID, seq, zlib.decompress(recv_packet[28:].rstrip(b"\x00")[:-4]), addr[0]
     return None
     
 def send(target, ID = 0x1234, data = b"", Type=8):
