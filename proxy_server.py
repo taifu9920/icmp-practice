@@ -9,6 +9,7 @@ def forward(conn1, conn2):
     try:
         while status[0]:
             data = conn1.recv(buffersize)
+            print(data)
             if data: conn2.send(data)
             else: break
     except Exception as e:
