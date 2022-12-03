@@ -46,14 +46,14 @@ def process(IP, data, ID):
                 server.close()
                 print("Forward connection failed")
         else:
-            if TCPs.get(ID): TCPs[ID].send(data)
+            if ID in TCPs: TCPs[ID].send(data)
             else:
                 try:
                     proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     proxy.connect((hostname, port))
                     proxy.send(data)
                     result = proxy.recv(buffersize)
-                    print(result)
+                    #print(result)
                     if result: send(IP, ID, result, 0)
                     proxy.close()
                     print("Web request successful and released")

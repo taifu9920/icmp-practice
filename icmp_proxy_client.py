@@ -15,29 +15,28 @@ def forward(conn, target, ID):
             if data: must_send(target,buffersize, 8, ID, data)
             else: break
     except Exception as e:
-        status[0] = False
-        print("Error on ICMP forwarding!")
         raise e
 
 def icmp_forward(target, ID):
     #ICMP to TCP
     try:
-        ping = must_send(target,buffersize, 8, ID, b"")
-        if ping: 
-            print("Ping successful")
-            while status[0]:
-                result = receive(icmp, buffersize)
-                if result:
-                    Type, code, checksum, ID, seq, data, IP = result
-                    print(ID, TCPs)
-                    if TCPs.get(ID):
-                        try:
-                            TCPs[ID].send(data)
-                        except Exception as e:
-                            TCPs[ID].close()
-                            del TCPs[ID]
-        else:
-            print("Ping failed!")
+        icmp = send(target, ID, b"")
+        ping = receive(icmp, buffersize)
+        while not ping: 
+            print("Ping failed... retry!")
+            icmp = send(target, ID, b"")
+            ping = receive(icmp, buffersize)
+        print("Ping successful")
+        while status[0]:
+            result = receive(icmp, buffersize)
+            if result:
+                Type, code, checksum, ID, seq, data, IP = result
+                if TCPs.get(ID):
+                    try:
+                        TCPs[ID].send(data)
+                    except Exception as e:
+                        TCPs[ID].close()
+                        del TCPs[ID]
     except Exception as e:
         status[0] = False
         print("Error on ICMP forwarding!")
@@ -64,13 +63,13 @@ def process(conn, ID, target):
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
                 conn.send(data)
-                print("Web request successful")
+                #print("Web request successful")
             else:
-                print("Web request failed")
+                #print("Web request failed")
                 conn.close()
         except Exception as e:
             conn.close()
-            print("Request connection failed")
+            #print("Request connection failed")
             raise e
     
 
