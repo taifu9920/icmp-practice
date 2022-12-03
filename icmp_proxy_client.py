@@ -33,7 +33,7 @@ def icmp_forward(target, ID):
                 if data and data[:7].lower() != b"connect":
                     if data and ID in TCPs:
                         try:
-                            print("sending data",data[:50],"to ID",ID)
+                            print("sending data",data[-50:],"to ID",ID)
                             TCPs[ID].send(data)
                         except Exception as e:
                             print("error!",e)
