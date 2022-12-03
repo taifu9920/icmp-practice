@@ -47,7 +47,6 @@ def icmp_forward(target, ID, data):
 
 def process(conn, ID, target):
     data = conn.recv(buffersize)
-    method = data[:data.find(b" ")]
     try:
         TCPs[ID] = conn
         threading.Thread(target=forward, args=(conn, target, ID), daemon = True).start()
