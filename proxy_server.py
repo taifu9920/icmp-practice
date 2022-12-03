@@ -56,14 +56,12 @@ def recv(status, sock):
                     proxy.connect((hostname, port))
                     proxy.send(data)
                     while 1:
-                        print("waiting...")
                         pending = select.select([proxy], [], [], 3)
                         if pending[0]: 
                             result = proxy.recv(buffersize)
-                            if result:
-                                conn.send(result)
-                                print(result)
+                            if result: conn.send(result)
                             else: break
+                        else: break
                     proxy.close()
                     conn.close()
                     print("Web request successful and released")
