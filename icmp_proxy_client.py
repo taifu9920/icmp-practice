@@ -22,18 +22,11 @@ def icmp_forward(target, ID, data):
     #ICMP to TCP
     try:
         icmp = send(target, ID, data)
-        result = receive(icmp, buffersize)
-        while not result: 
-            icmp = send(target, ID, data)
-            result = receive(icmp, buffersize)
-        Type, code, checksum, ID, seq, data, IP = result
-        TCPs[ID].send(data)
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                print(data[:9])
-                if data[:9] != "echoreply":
+                if data[:9] != b"echoreply":
                     if data:
                         if ID in TCPs:
                             try:
