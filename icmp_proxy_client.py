@@ -3,7 +3,7 @@ from src.icmp import *
 
 connection_limit = 5 # non-accepted connections limit
 status = [True]
-buffersize = 2**16
+buffersize = 2**20
 TCPs = dict()
 
 def forward(conn, target, ID):
