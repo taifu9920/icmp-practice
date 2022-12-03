@@ -16,16 +16,14 @@ def forward(conn, target, ID):
     except Exception as e:
         "Ignored"
 
-def icmp_forward(target, ID):
+def icmp_forward(target, ID, data):
     #ICMP to TCP
     try:
-        icmp = send(target, ID, b"")
-        ping = receive(icmp, buffersize)
+        icmp = send(target, ID, data)
+        result = receive(icmp, buffersize)
         while not ping: 
-            #print("Ping failed... retry!")
-            icmp = send(target, ID, b"")
-            ping = receive(icmp, buffersize)
-        #print("Ping successful")
+            icmp = send(target, ID, data)
+            result = receive(icmp, buffersize)
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
@@ -50,11 +48,7 @@ def process(conn, ID, target):
         try:
             TCPs[ID] = conn
             threading.Thread(target=forward, args=(conn, target, ID), daemon = True).start()
-            threading.Thread(target=icmp_forward, args=(target,ID), daemon = True).start()
-            print("Trying to connect ICMP proxy server...")
-            result = must_send(target, buffersize, 8, ID, data)
-            if result: print("ICMP connect request sent")
-            else: print("Failed to send icmp connect data")
+            threading.Thread(target=icmp_forward, args=(target,ID, data), daemon = True).start()
         except Exception as e:
             if ID in TCPs: del TCPs[ID]
             conn.close()
