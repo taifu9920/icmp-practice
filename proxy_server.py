@@ -38,30 +38,18 @@ def recv(status, sock):
         else: port = 80
         path = b"/"
         if hostname and port:
-            if(method.lower() == b"connect"):
-                try:
-                    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    server.connect((hostname, port))
-                    threading.Thread(target=forward, args=(conn,server), daemon = True).start()
-                    threading.Thread(target=forward, args=(server,conn), daemon = True).start()
+            try:
+                server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                server.connect((hostname, port))
+                threading.Thread(target=forward, args=(conn,server), daemon = True).start()
+                threading.Thread(target=forward, args=(server,conn), daemon = True).start()
+                if(method.lower() == b"connect"):
                     conn.send(f"HTTP/{version} 200 Connection Established".encode())
-                    print("CONNECT method connection established")
-                except Exception as e:
-                    server.close()
-                    conn.close()
-                    print("Forward connection failed")
-            else:
-                try:
-                    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    server.connect((hostname, port))
-                    threading.Thread(target=forward, args=(conn,server), daemon = True).start()
-                    threading.Thread(target=forward, args=(server,conn), daemon = True).start()
-                    server.send(data)
-                except Exception as e:
-                    server.close()
-                    conn.close()
-                    raise e
-                    print("Request connection failed")
+                else: server.send(data)
+            except Exception as e:
+                server.close()
+                conn.close()
+                print("Request connection failed")
 
 def main():
     if len(sys.argv) < 2:
