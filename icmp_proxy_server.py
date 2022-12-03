@@ -60,6 +60,7 @@ def process(IP, data, ID):
                 except Exception as e:
                     proxy.close()
                     print("Request connection failed")
+                    raise e
 
 def icmp_listener():
     #ICMP to TCP
