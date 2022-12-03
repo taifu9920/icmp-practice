@@ -60,6 +60,7 @@ def recv(status, sock):
                         pending = select.select([proxy], [], [], 3)
                         if pending[0]: 
                             result = proxy.recv(buffersize)
+                            print(result)
                             if result: datas += result
                             else: break
                         else: break
