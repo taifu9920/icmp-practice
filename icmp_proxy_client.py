@@ -12,32 +12,32 @@ def forward(conn, target, ID):
     try:
         while status[0]:
             data = conn.recv(buffersize)
-            if data:
-                send(target, ID, data)
+            if data: must_send(target,buffersize, 8, ID, data)
             else: break
     except Exception as e:
+        status[0] = False
+        print("Error on ICMP forwarding!")
         raise e
 
 def icmp_forward(target, ID):
     #ICMP to TCP
     try:
-        icmp = send(target, ID, b"")
-        ping = receive(icmp, buffersize)
-        while not ping: 
-            icmp = send(target, ID, b"")
-            ping = receive(icmp, buffersize)
-        print("Ping successful")
-        while status[0]:
-            result = receive(icmp, buffersize)
-            if result:
-                Type, code, checksum, ID, seq, data, IP = result
-                print(ID, TCPs)
-                if TCPs.get(ID):
-                    try:
-                        TCPs[ID].send(data)
-                    except Exception as e:
-                        TCPs[ID].close()
-                        del TCPs[ID]
+        ping = must_send(target,buffersize, 8, ID, b"")
+        if ping: 
+            print("Ping successful")
+            while status[0]:
+                result = receive(icmp, buffersize)
+                if result:
+                    Type, code, checksum, ID, seq, data, IP = result
+                    print(ID, TCPs)
+                    if TCPs.get(ID):
+                        try:
+                            TCPs[ID].send(data)
+                        except Exception as e:
+                            TCPs[ID].close()
+                            del TCPs[ID]
+        else:
+            print("Ping failed!")
     except Exception as e:
         status[0] = False
         print("Error on ICMP forwarding!")
@@ -48,26 +48,30 @@ def process(conn, ID, target):
     method = data[:data.find(b" ")]
     if(method.lower() == b"connect"):
         try:
-            threading.Thread(target=forward, args=(conn, target, addr[1]), daemon = True).start()
-            threading.Thread(target=icmp_forward, args=(target,addr[1]), daemon = True).start()
+            threading.Thread(target=forward, args=(conn, target, ID), daemon = True).start()
+            threading.Thread(target=icmp_forward, args=(target,ID), daemon = True).start()
             print("Trying to connect ICMP proxy server...")
-            result = must_send(target, buffersize, 8, addr[1], data)
+            result = must_send(target, buffersize, 8, ID, data)
             if result: print("ICMP connect request sent")
             else: print("Failed to send icmp connect data")
         except Exception as e:
-            del TCPs[addr[1]]
+            if ID in TCPs: del TCPs[ID]
             conn.close()
             print("Forward connection failed")
     else:
         try:
-            result = must_send(target, buffersize,8, addr[1], data, 8, True)
-            Type, code, checksum, ID, seq, data, IP = result
-            conn.send(result)
-            if result: print("Web request successful")
-            else: print("Web request failed")
+            result = must_send(target, buffersize,8, ID, data, 8, True)
+            if result:
+                Type, code, checksum, ID, seq, data, IP = result
+                conn.send(data)
+                print("Web request successful")
+            else:
+                print("Web request failed")
+                conn.close()
         except Exception as e:
             conn.close()
             print("Request connection failed")
+            raise e
     
 
 def recv(status, sock, target):
