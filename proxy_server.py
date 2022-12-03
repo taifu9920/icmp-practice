@@ -56,9 +56,12 @@ def recv(status, sock):
                     proxy.connect((hostname, port))
                     proxy.send(data)
                     while 1:
+                        print("waiting for data")
                         pending = select.select([proxy], [], [], 5)
+                        print("have data!")
                         if pending[0]: 
                             result = proxy.recv(buffersize)
+                            print(result)
                             conn.send(result)
                         else: break
                     proxy.close()
@@ -67,7 +70,8 @@ def recv(status, sock):
                 except Exception as e:
                     proxy.close()
                     conn.close()
-                    print("Request onnection failed")
+                    raise e
+                    print("Request connection failed")
 
 def main():
     if len(sys.argv) < 2:
