@@ -66,7 +66,7 @@ def icmp_listener():
                                         server.connect((hostname, port))
                                         TCPs[ID] = server
                                         threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
-                                        send(IP, ID, f"HTTP/{version.decode()} 200 Connection Established".encode(), 0)
+                                        send(IP, ID, f"HTTP/{version.decode()} 200 Connection established".encode(), 0)
                                         print("HTTPS connection request received", ID)
                                     except Exception as e:
                                         server.close()
