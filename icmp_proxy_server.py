@@ -35,6 +35,7 @@ def process(IP, data, ID):
     elif URL.startswith(b"https://"): port = 443
     else: port = 80
     path = b"/"
+    print(hostname, port)
     if hostname and port:
         if(method.lower() == b"connect"):
             try:
