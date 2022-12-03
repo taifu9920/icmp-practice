@@ -21,7 +21,7 @@ def icmp_forward(target, ID, data):
     try:
         icmp = send(target, ID, data)
         result = receive(icmp, buffersize)
-        while not ping: 
+        while not result: 
             icmp = send(target, ID, data)
             result = receive(icmp, buffersize)
         while status[0]:

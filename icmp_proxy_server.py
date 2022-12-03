@@ -10,7 +10,7 @@ def forward(conn, target, ID):
     try:
         while status[0]:
             data = conn.recv(buffersize)
-            print(data[-50:])
+            print("sending data", data[-50:], "To ID", ID)
             if data: send(target, ID, data, 0)
             else: break
     except Exception as e:
