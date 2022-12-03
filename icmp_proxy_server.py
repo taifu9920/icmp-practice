@@ -17,37 +17,37 @@ def forward(conn, target, ID):
         raise e
 
 def process(IP, data, ID):
-    print(data)
-    method = data[:data.find(b" ")]
-    URL = data[data.find(b" ")+1:]
-    version = data[data.find(b" ")+1:]
-    version = version[version.find(b"HTTP/")+5:]
-    version = version[:version.find(b"\r\n")]
-    URL = URL[:URL.find(b" ")]
-    if (URL.startswith(b"http")):
-        hostname = URL[URL.find(b"://")+3:]
-        hostname = hostname[:hostname.find(b"/")]
-    else: 
-        hostname = URL
-    if hostname.find(b":") != -1:
-        port = eval(hostname[hostname.find(b":")+1:])
-        hostname = hostname[:hostname.find(b":")]
-    elif URL.startswith(b"https://"): port = 443
-    else: port = 80
-    path = b"/"
-    print(hostname, port)
-    if hostname and port:
-        if(method.lower() == b"connect"):
-            try:
-                server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                server.connect((hostname, port))
-                threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
-                send(IP, ID, f"HTTP/{version} 200 Connection Established".encode(), 0)
-            except Exception as e:
-                server.close()
-                print("Forward connection failed")
-        else:
-            if ID in TCPs: TCPs[ID].send(data)
+    if ID in TCPs: TCPs[ID].send(data)
+    else:
+        print(data)
+        method = data[:data.find(b" ")]
+        URL = data[data.find(b" ")+1:]
+        version = data[data.find(b" ")+1:]
+        version = version[version.find(b"HTTP/")+5:]
+        version = version[:version.find(b"\r\n")]
+        URL = URL[:URL.find(b" ")]
+        if (URL.startswith(b"http")):
+            hostname = URL[URL.find(b"://")+3:]
+            hostname = hostname[:hostname.find(b"/")]
+        else: 
+            hostname = URL
+        if hostname.find(b":") != -1:
+            port = eval(hostname[hostname.find(b":")+1:])
+            hostname = hostname[:hostname.find(b":")]
+        elif URL.startswith(b"https://"): port = 443
+        else: port = 80
+        path = b"/"
+        #print(hostname, port)
+        if hostname and port:
+            if(method.lower() == b"connect"):
+                try:
+                    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    server.connect((hostname, port))
+                    threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
+                    send(IP, ID, f"HTTP/{version} 200 Connection Established".encode(), 0)
+                except Exception as e:
+                    server.close()
+                    print("Forward connection failed")
             else:
                 try:
                     proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
