@@ -2,7 +2,7 @@ import socket, threading, sys, ssl, time
 from src.icmp import *
 
 status = [True]
-buffersize = 2**50
+buffersize = 2**30
 TCPs = dict()
 
 def forward(conn, target, ID):
