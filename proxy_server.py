@@ -55,9 +55,12 @@ def recv(status, sock):
                     proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     proxy.connect((hostname, port))
                     proxy.send(data)
-                    result = proxy.recv(buffersize)
-                    print(result)
-                    if result: conn.send(result)
+                    while 1:
+                        pending = select.select([proxy], [], [], 5)
+                        if pending[0]: 
+                            result = proxy.recv(buffersize)
+                            conn.send(result)
+                        else: break
                     proxy.close()
                     conn.close()
                     print("Web request successful and released")
