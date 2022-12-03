@@ -27,7 +27,9 @@ def icmp_listener():
                 Type, code, checksum, ID, seq, data, IP = result
                 send(IP, ID, data, 0) # echo reply
                 if data:
-                    if ID in TCPs: TCPs[ID].send(data)
+                    if ID in TCPs: 
+                        print("sending", data, "to web request ID", ID)
+                        TCPs[ID].send(data)
                     else:
                         method = data[:data.find(b" ")]
                         URL = data[data.find(b" ")+1:]
