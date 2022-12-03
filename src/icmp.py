@@ -23,7 +23,7 @@ def receive(sock, size):
     
 def send(target, ID = 0x1234, data = b"", Type=8):
     data = zlib.compress(data)
-    while len(data) < 18 or len(data) % 2 != 0: data += 0x00 # padding
+    while len(data) < 18 or len(data) % 2 != 0: data += b"\0" # padding
     sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
     header = struct.pack("bbHHh", Type, 0, 0, ID, 1)
     # htons() will convert decimal into network formatting
