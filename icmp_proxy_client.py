@@ -8,14 +8,13 @@ TCPs = dict()
 
 def forward(conn, target, ID):
     #TCP to ICMP
-    TCPs[ID] = conn
     try:
         while status[0]:
             data = conn.recv(buffersize)
             if data: must_send(target,buffersize, 8, ID, data)
             else: break
     except Exception as e:
-        raise e
+        "Ignored"
 
 def icmp_forward(target, ID):
     #ICMP to TCP
@@ -31,11 +30,10 @@ def icmp_forward(target, ID):
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                if ID in TCPs:
+                if data and ID in TCPs:
                     try:
                         TCPs[ID].send(data)
                     except Exception as e:
-                        TCPs[ID].close()
                         del TCPs[ID]
                         raise e
     except Exception as e:
@@ -48,6 +46,7 @@ def process(conn, ID, target):
     method = data[:data.find(b" ")]
     if(method.lower() == b"connect"):
         try:
+            TCPs[ID] = conn
             threading.Thread(target=forward, args=(conn, target, ID), daemon = True).start()
             threading.Thread(target=icmp_forward, args=(target,ID), daemon = True).start()
             print("Trying to connect ICMP proxy server...")
@@ -57,6 +56,7 @@ def process(conn, ID, target):
         except Exception as e:
             if ID in TCPs: del TCPs[ID]
             conn.close()
+            raise e
             print("Forward connection failed")
     else:
         try:
@@ -71,7 +71,7 @@ def process(conn, ID, target):
         except Exception as e:
             conn.close()
             #print("Request connection failed")
-            raise e
+            #raise e
     
 
 def recv(status, sock, target):

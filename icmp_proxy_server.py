@@ -66,9 +66,9 @@ def process(IP, data, ID):
                         proxy.close()
                         print("Request connection failed")
                         raise e
-        except Exception as e:
+        except Exception:
             now = time.time()
-            while ID not in TCPs and time.time() - now < 20:
+            while ID not in TCPs and time.time() - now < 10:
                 time.sleep(1)
             if ID in TCPs: TCPs[ID].send(data)
             else: print("HTTPS request timeouted!")
