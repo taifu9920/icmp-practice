@@ -21,11 +21,13 @@ def forward(conn, target, ID):
 def icmp_forward(target, ID, data):
     #ICMP to TCP
     try:
+        print(data)
         icmp = send(target, ID, data)
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
+                print(data)
                 if data[:9] != b"echoreply":
                     if data:
                         if ID in TCPs:
@@ -47,6 +49,7 @@ def icmp_forward(target, ID, data):
 def process(conn, ID, target):
     data = conn.recv(buffersize)
     method = data[:data.find(b" ")]
+    print(data)
     if(method.lower() == b"connect"):
         try:
             TCPs[ID] = conn

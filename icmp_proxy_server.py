@@ -66,7 +66,7 @@ def icmp_listener():
                                         server.connect((hostname, port))
                                         TCPs[ID] = server
                                         threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
-                                        send(IP, ID, f"HTTP/{version} 200 Connection Established".encode(), 0)
+                                        send(IP, ID, f"HTTP/{version.decode()} 200 Connection Established".encode(), 0)
                                         print("HTTPS connection request received", ID)
                                     except Exception as e:
                                         server.close()
@@ -76,7 +76,6 @@ def icmp_listener():
                                         proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                         proxy.connect((hostname, port))
                                         proxy.send(data)
-                                        print(data)
                                         result = proxy.recv(buffersize)
                                         #print(result)
                                         if result: send(IP, ID, result, 0)
