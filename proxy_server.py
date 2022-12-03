@@ -74,8 +74,6 @@ def main():
             else:
                 print("Unknown command, Use `help` to show all commands")
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.connect(("localhost", port))
-        server.send(b"\x00")
         server.close()
         print("Server stopped")
 
