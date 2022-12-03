@@ -62,7 +62,7 @@ def recv(status, sock):
                             if result: conn.send(result)
                             else: break
                         else: break
-                    conn.send(b"\x00")
+                    conn.send(b"\r\n\r\n")
                     proxy.close()
                     conn.close()
                     print("Web request successful and released")
