@@ -83,7 +83,6 @@ def icmp_listener():
                                 except Exception as e:
                                     proxy.close()
                                     print("Request connection failed")
-                                    raise e
     except Exception as e:
         status[0] = False
         print("Error on ICMP forwarding!")
