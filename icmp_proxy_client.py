@@ -3,14 +3,14 @@ from src.icmp import *
 
 connection_limit = 5 # non-accepted connections limit
 status = [True]
-buffersize = 2**20
+buffersize = 2**15
 TCPs = dict()
 
 def forward(conn, target, ID):
     #TCP to ICMP
     try:
         while status[0]:
-            data = conn.recv(buffersize-2**15)
+            data = conn.recv(buffersize-2**12)
             if data: 
                 #print("sending ICMP data", data, "to server with ID", ID)
                 send(target, ID, data)
