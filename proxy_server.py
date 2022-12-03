@@ -52,24 +52,13 @@ def recv(status, sock):
                     print("Forward connection failed")
             else:
                 try:
-                    proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    proxy.connect((hostname, port))
-                    proxy.send(data)
-                    datas = b""
-                    while 1:
-                        pending = select.select([proxy], [], [], 3)
-                        if pending[0]: 
-                            result = proxy.recv(buffersize)
-                            print(result)
-                            if result: datas += result
-                            else: break
-                        else: break
-                    if datas: conn.send(datas)
-                    proxy.close()
-                    conn.close()
-                    print("Web request successful and released")
+                    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    server.connect((hostname, port))
+                    threading.Thread(target=forward, args=(conn,server), daemon = True).start()
+                    threading.Thread(target=forward, args=(server,conn), daemon = True).start()
+                    server.send(data)
                 except Exception as e:
-                    proxy.close()
+                    server.close()
                     conn.close()
                     raise e
                     print("Request connection failed")
