@@ -9,7 +9,6 @@ def forward(conn1, conn2):
     try:
         while status[0]:
             data = conn1.recv(buffersize)
-            print(data)
             if data: conn2.send(data)
             else: break
     except Exception as e:
@@ -56,6 +55,7 @@ def recv(status, sock):
                     proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     proxy.connect((hostname, port))
                     proxy.send(data)
+                    print(data)
                     result = proxy.recv(buffersize)
                     #print(result)
                     if result: conn.send(result)
