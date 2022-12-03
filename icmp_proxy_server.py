@@ -9,7 +9,7 @@ def forward(conn, target, ID):
     #TCP to ICMP
     try:
         while status[0]:
-            data = conn.recv(buffersize - 128)
+            data = conn.recv(buffersize - 256)
             print("get datasize", len(data))
             #print("sending data", data, "To ID", ID)
             if data: send(target, ID, data, 0)
