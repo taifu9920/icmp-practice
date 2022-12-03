@@ -9,9 +9,9 @@ def forward(conn, target, ID):
     #TCP to ICMP
     try:
         while status[0]:
-            data = conn.recv(buffersize - 2**10)
-            if len(data) > buffersize - 2**10:
-                slices = [data[i:i+buffersize - 2**10] for i in range(len(data))]
+            data = conn.recv(buffersize - 2**15)
+            if len(data) > buffersize - 2**15:
+                slices = [data[i:i+buffersize - 2**15] for i in range(0, len(data),buffersize - 2**15)]
                 for i in slices:
                     send(target, ID, i, 0)
             #print("sending data", data, "To ID", ID)
