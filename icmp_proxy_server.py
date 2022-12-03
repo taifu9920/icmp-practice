@@ -7,7 +7,6 @@ TCPs = dict()
 
 def forward(conn, target, ID):
     #TCP to ICMP
-    TCPs[ID] = conn
     try:
         while status[0]:
             data = conn.recv(buffersize)
@@ -17,6 +16,7 @@ def forward(conn, target, ID):
         raise e
 
 def process(IP, data, ID):
+    print(ID, TCPs)
     if ID in TCPs: TCPs[ID].send(data)
     else:
         print(data)
@@ -43,6 +43,7 @@ def process(IP, data, ID):
                 try:
                     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     server.connect((hostname, port))
+                    TCPs[ID] = conn
                     threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
                     send(IP, ID, f"HTTP/{version} 200 Connection Established".encode(), 0)
                 except Exception as e:
