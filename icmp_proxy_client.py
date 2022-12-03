@@ -30,7 +30,7 @@ def icmp_forward(target, ID):
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                if data and data[:7].lower() != b"connect":
+                if data.strip() and data[:7].lower() != b"connect":
                     if data and ID in TCPs:
                         try:
                             print("sending data",data[-50:],"to ID",ID)
