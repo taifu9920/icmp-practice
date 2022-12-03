@@ -12,7 +12,7 @@ def forward(conn, target, ID):
         while status[0]:
             data = conn.recv(buffersize)
             if data: 
-                print("sending ICMP data", data, "to server with ID", ID)
+                #print("sending ICMP data", data, "to server with ID", ID)
                 send(target, ID, data)
             else: break
     except Exception as e:
@@ -30,7 +30,7 @@ def icmp_forward(target, ID, data):
                     if data:
                         if ID in TCPs:
                             try:
-                                print("sending data",data[-50:],"to ID",ID)
+                                #print("sending data",data[-50:],"to ID",ID)
                                 TCPs[ID].send(data)
                             except Exception as e:
                                 print("error!",e)

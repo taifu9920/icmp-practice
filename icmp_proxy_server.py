@@ -10,7 +10,7 @@ def forward(conn, target, ID):
     try:
         while status[0]:
             data = conn.recv(buffersize)
-            print("sending data", data, "To ID", ID)
+            #print("sending data", data, "To ID", ID)
             if data: send(target, ID, data, 0)
             else: break
     except Exception as e:
@@ -28,8 +28,12 @@ def icmp_listener():
                 send(IP, ID, b"echoreply", 0) # echo reply
                 if data:
                     if ID in TCPs: 
-                        print("sending", data, "to web request ID", ID)
-                        TCPs[ID].send(data)
+                        #print("sending", data, "to web request ID", ID)
+                        try:
+                            TCPs[ID].send(data)
+                        except Exception:
+                            print("Failed to send, socket is dead")
+                            del TCPs[ID]
                     else:
                         method = data[:data.find(b" ")]
                         URL = data[data.find(b" ")+1:]
@@ -52,7 +56,7 @@ def icmp_listener():
                         if hostname and port:
                             if(method.lower() == b"connect"):
                                 try:
-                                    print(data)
+                                    #print(data)
                                     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                     server.connect((hostname, port))
                                     TCPs[ID] = server
