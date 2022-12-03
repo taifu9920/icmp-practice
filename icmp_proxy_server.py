@@ -76,7 +76,7 @@ def icmp_listener():
                                         proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                         proxy.connect((hostname, port))
                                         proxy.send(data)
-                                        print(hostname, port)
+                                        print(data)
                                         result = proxy.recv(buffersize)
                                         #print(result)
                                         if result: send(IP, ID, result, 0)
