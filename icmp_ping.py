@@ -7,7 +7,8 @@ def main():
     if (len(sys.argv) < 2): target = default_target
     else: target = sys.argv[1]
     while status:
-        cmd = input("Terminal# ").lower().strip()
+        raw = input("Terminal# ")
+        cmd = raw.lower().strip()
         if cmd == "stop" or cmd == "exit":
             status = False
         elif cmd == "help":
@@ -17,7 +18,7 @@ def main():
         else:
             try:
                 print(f"Pinging {target}...")
-                conn = send(target, 0x1234, cmd.encode()) # send ping
+                conn = send(target, 0x1234, raw.encode()) # send ping
                 result = receive(conn, 1024) # fetch feedback
                 if result:
                     Type, code, checksum, ID, seq, data, addr = result

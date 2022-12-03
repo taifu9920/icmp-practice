@@ -30,14 +30,14 @@ def icmp_forward(target, ID):
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
-                print(ID, data)
-                print(TCPs)
-                if data and ID in TCPs:
-                    try:
-                        TCPs[ID].send(data)
-                    except Exception as e:
-                        del TCPs[ID]
-                        raise e
+                if data and data[:7].lower() != b"connect":
+                    if data and ID in TCPs:
+                        try:
+                            print("sending data",data[:50],"to ID",ID)
+                            TCPs[ID].send(data)
+                        except Exception as e:
+                            print("error!",e)
+                            del TCPs[ID]
     except Exception as e:
         status[0] = False
         print("Error on ICMP forwarding!")
