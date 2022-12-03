@@ -14,8 +14,7 @@ def forward(conn, target, ID):
                 slices = [data[i:i+buffersize - 2**12] for i in range(0, len(data),buffersize - 2**12)]
                 for i in slices:
                     send(target, ID, i, 0)
-            #print("sending data", data, "To ID", ID)
-            if data: send(target, ID, data, 0)
+            elif data: send(target, ID, data, 0)
             else: break
     except Exception as e:
         raise e
@@ -71,6 +70,7 @@ def icmp_listener():
                                     server.close()
                                     print("Forward connection failed")
                         except Exception as e:
+                            print(data)
                             print("Can't read this packet!")
                             "I can't process this part for now"
     except Exception as e:
