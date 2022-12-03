@@ -15,64 +15,6 @@ def forward(conn, target, ID):
     except Exception as e:
         raise e
 
-def process(IP, data, ID):
-    print(ID, TCPs)
-    if ID in TCPs: TCPs[ID].send(data)
-    else:
-        print(data)
-        method = data[:data.find(b" ")]
-        URL = data[data.find(b" ")+1:]
-        version = data[data.find(b" ")+1:]
-        version = version[version.find(b"HTTP/")+5:]
-        version = version[:version.find(b"\r\n")]
-        URL = URL[:URL.find(b" ")]
-        if (URL.startswith(b"http")):
-            hostname = URL[URL.find(b"://")+3:]
-            hostname = hostname[:hostname.find(b"/")]
-        else: 
-            hostname = URL
-        if hostname.find(b":") != -1:
-            port = eval(hostname[hostname.find(b":")+1:])
-            hostname = hostname[:hostname.find(b":")]
-        elif URL.startswith(b"https://"): port = 443
-        else: port = 80
-        path = b"/"
-        #print(hostname, port)
-        try:
-            hostname = hostname.decode()
-            if hostname and port:
-                if(method.lower() == b"connect"):
-                    try:
-                        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        server.connect((hostname, port))
-                        TCPs[ID] = server
-                        threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
-                        #send(IP, ID, f"HTTP/{version} 200 Connection Established".encode(), 0)
-                        print("HTTPS connection request received", ID)
-                    except Exception as e:
-                        server.close()
-                        print("Forward connection failed")
-                else:
-                    try:
-                        proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        proxy.connect((hostname, port))
-                        proxy.send(data)
-                        result = proxy.recv(buffersize)
-                        #print(result)
-                        if result: send(IP, ID, result, 0)
-                        proxy.close()
-                        print("Web request successful and released")
-                    except Exception as e:
-                        proxy.close()
-                        print("Request connection failed")
-                        raise e
-        except Exception:
-            now = time.time()
-            while ID not in TCPs and time.time() - now < 10:
-                time.sleep(1)
-            if ID in TCPs: TCPs[ID].send(data)
-            else: print("HTTPS request timeouted!")
-
 def icmp_listener():
     #ICMP to TCP
     try:
@@ -83,7 +25,61 @@ def icmp_listener():
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
                 send(IP, ID, data, 0) # echo reply
-                if data: threading.Thread(target=process, args=(IP, data, ID)).start()
+                if ID in TCPs: TCPs[ID].send(data)
+                else:
+                    print(data)
+                    method = data[:data.find(b" ")]
+                    URL = data[data.find(b" ")+1:]
+                    version = data[data.find(b" ")+1:]
+                    version = version[version.find(b"HTTP/")+5:]
+                    version = version[:version.find(b"\r\n")]
+                    URL = URL[:URL.find(b" ")]
+                    if (URL.startswith(b"http")):
+                        hostname = URL[URL.find(b"://")+3:]
+                        hostname = hostname[:hostname.find(b"/")]
+                    else: 
+                        hostname = URL
+                    if hostname.find(b":") != -1:
+                        port = eval(hostname[hostname.find(b":")+1:])
+                        hostname = hostname[:hostname.find(b":")]
+                    elif URL.startswith(b"https://"): port = 443
+                    else: port = 80
+                    path = b"/"
+                    #print(hostname, port)
+                    try:
+                        hostname = hostname.decode()
+                        if hostname and port:
+                            if(method.lower() == b"connect"):
+                                try:
+                                    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                    server.connect((hostname, port))
+                                    TCPs[ID] = server
+                                    threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
+                                    send(IP, ID, f"HTTP/{version} 200 Connection Established".encode(), 0)
+                                    print("HTTPS connection request received", ID)
+                                except Exception as e:
+                                    server.close()
+                                    print("Forward connection failed")
+                            else:
+                                try:
+                                    proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                    proxy.connect((hostname, port))
+                                    proxy.send(data)
+                                    result = proxy.recv(buffersize)
+                                    #print(result)
+                                    if result: send(IP, ID, result, 0)
+                                    proxy.close()
+                                    print("Web request successful and released")
+                                except Exception as e:
+                                    proxy.close()
+                                    print("Request connection failed")
+                                    raise e
+                    except Exception:
+                        now = time.time()
+                        while ID not in TCPs and time.time() - now < 10:
+                            time.sleep(1)
+                        if ID in TCPs: TCPs[ID].send(data)
+                        else: print("HTTPS request timeouted!")
     except Exception as e:
         status[0] = False
         print("Error on ICMP forwarding!")
