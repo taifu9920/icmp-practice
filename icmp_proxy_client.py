@@ -22,14 +22,15 @@ def icmp_forward(target, ID):
         icmp = send(target, ID, b"")
         ping = receive(icmp, buffersize)
         while not ping: 
-            print("Ping failed... retry!")
+            #print("Ping failed... retry!")
             icmp = send(target, ID, b"")
             ping = receive(icmp, buffersize)
-        print("Ping successful")
+        #print("Ping successful")
         while status[0]:
             result = receive(icmp, buffersize)
             if result:
                 Type, code, checksum, ID, seq, data, IP = result
+                print(ID, data)
                 if data and ID in TCPs:
                     try:
                         TCPs[ID].send(data)
@@ -72,7 +73,6 @@ def process(conn, ID, target):
             conn.close()
             #print("Request connection failed")
             #raise e
-    
 
 def recv(status, sock, target):
     #capture TCP and forward to ICMP

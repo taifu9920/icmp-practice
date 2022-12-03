@@ -28,7 +28,6 @@ def icmp_listener():
                 if data:
                     if ID in TCPs: TCPs[ID].send(data)
                     else:
-                        print(data)
                         method = data[:data.find(b" ")]
                         URL = data[data.find(b" ")+1:]
                         version = data[data.find(b" ")+1:]
@@ -50,6 +49,7 @@ def icmp_listener():
                         if hostname and port:
                             if(method.lower() == b"connect"):
                                 try:
+                                    print(data)
                                     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                     server.connect((hostname, port))
                                     TCPs[ID] = server
