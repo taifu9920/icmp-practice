@@ -10,7 +10,10 @@ def forward(conn, target, ID):
     try:
         while status[0]:
             data = conn.recv(buffersize - 2**10)
-            print("get datasize", len(data))
+            if len(data) > buffersize - 2**10:
+                slices = [data[i:i+buffersize - 2**10] for i in range(len(data))]
+                for i in slices:
+                    send(target, ID, i, 0)
             #print("sending data", data, "To ID", ID)
             if data: send(target, ID, data, 0)
             else: break
