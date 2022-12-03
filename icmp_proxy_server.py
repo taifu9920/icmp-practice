@@ -1,4 +1,4 @@
-import socket, threading, sys, ssl
+import socket, threading, sys, ssl, time
 from src.icmp import *
 
 status = [True]
@@ -38,32 +38,40 @@ def process(IP, data, ID):
         else: port = 80
         path = b"/"
         #print(hostname, port)
-        if hostname and port:
-            if(method.lower() == b"connect"):
-                try:
-                    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    server.connect((hostname, port))
-                    TCPs[ID] = server
-                    threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
-                    #send(IP, ID, f"HTTP/{version} 200 Connection Established".encode(), 0)
-                    print("HTTPS connection request received", ID)
-                except Exception as e:
-                    server.close()
-                    print("Forward connection failed")
-            else:
-                try:
-                    proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    proxy.connect((hostname, port))
-                    proxy.send(data)
-                    result = proxy.recv(buffersize)
-                    #print(result)
-                    if result: send(IP, ID, result, 0)
-                    proxy.close()
-                    print("Web request successful and released")
-                except Exception as e:
-                    proxy.close()
-                    print("Request connection failed")
-                    raise e
+        try:
+            hostname = hostname.decode()
+            if hostname and port:
+                if(method.lower() == b"connect"):
+                    try:
+                        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        server.connect((hostname, port))
+                        TCPs[ID] = server
+                        threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
+                        #send(IP, ID, f"HTTP/{version} 200 Connection Established".encode(), 0)
+                        print("HTTPS connection request received", ID)
+                    except Exception as e:
+                        server.close()
+                        print("Forward connection failed")
+                else:
+                    try:
+                        proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        proxy.connect((hostname, port))
+                        proxy.send(data)
+                        result = proxy.recv(buffersize)
+                        #print(result)
+                        if result: send(IP, ID, result, 0)
+                        proxy.close()
+                        print("Web request successful and released")
+                    except Exception as e:
+                        proxy.close()
+                        print("Request connection failed")
+                        raise e
+        except TypeError:
+            now = time.time()
+            while ID not in TCPs and time.time() - now < 20:
+                time.sleep(1)
+            if ID in TCPs: TCPs[ID].send(data)
+            else: print("HTTPS request timeouted!")
 
 def icmp_listener():
     #ICMP to TCP
