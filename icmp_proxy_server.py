@@ -59,31 +59,17 @@ def icmp_listener():
                             path = b"/"
                             #print(hostname, port)
                             if hostname and port:
-                                if(method.lower() == b"connect"):
-                                    try:
-                                        #print(data)
-                                        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                                        server.connect((hostname, port))
-                                        TCPs[ID] = server
-                                        threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
+                                try:
+                                    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                    server.connect((hostname, port))
+                                    TCPs[ID] = server
+                                    threading.Thread(target=forward, args=(server, IP, ID), daemon = True).start()
+                                    if(method.lower() == b"connect"):
                                         send(IP, ID, f"HTTP/{version} 200 Connection established".encode(), 0)
-                                        print("HTTPS connection request received", ID)
-                                    except Exception as e:
-                                        server.close()
-                                        print("Forward connection failed")
-                                else:
-                                    try:
-                                        proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                                        proxy.connect((hostname, port))
-                                        proxy.send(data)
-                                        result = proxy.recv(buffersize)
-                                        #print(result)
-                                        if result: send(IP, ID, result, 0)
-                                        proxy.close()
-                                        print("Web request successful and released")
-                                    except Exception as e:
-                                        proxy.close()
-                                        print("Request connection failed")
+                                    else: server.send(data)
+                                except Exception as e:
+                                    server.close()
+                                    print("Forward connection failed")
                         except Exception as e:
                             print("Can't read this packet!")
                             "I can't process this part for now"
