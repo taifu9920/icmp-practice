@@ -1,5 +1,6 @@
 # ICMP project for CSC521
 ##### This Project can hides a proxy server behind ICMP
+##### The program may still having some problem, but it's able to use now
 ## How to Run:
 ##### 1. Run `python3 icmp_proxy_server.py` on the machine you want as proxy server host
 ##### 2. And the machine must have set to ignore Echo Reply (See this if you don't know how to https://unix.stackexchange.com/questions/412446/how-to-disable-ping-response-icmp-echo-in-linux-all-the-time)
