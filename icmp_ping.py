@@ -1,7 +1,7 @@
 from src.icmp import *
 import socket, threading
 default_target = "rmh.i234.me"
-
+#This is ICMP ping, which send ICMP request and receive ICMP reply, The data is what user inputs
 def main():
     status = True
     if (len(sys.argv) < 2): target = default_target

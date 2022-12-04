@@ -1,5 +1,5 @@
 import socket, threading, sys, ssl, select
-
+#This provide TCP Proxy Server
 connection_limit = 5 # non-accepted connections limit
 status = [True]
 buffersize = 2**16

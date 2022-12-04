@@ -3,7 +3,7 @@ import socket, threading
 status = [True]
 buffersize = 2**16
 last = [None, None]
-
+#This is ICMP testing file, which will receive ICMP Echo Request, and send ICMP Echo Reply
 def recv(status, last):
     try:
         icmp = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
