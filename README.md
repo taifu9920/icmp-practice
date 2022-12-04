@@ -13,3 +13,5 @@
 ![image](https://github.com/taifu9920/icmp-practice/blob/main/Framework.png?raw=true)
 ##### The main goal on this project is to establish the connection between TCP and ICMP,
 ##### So any service can hides inside ICMP, like the demo are Proxy Server.
+## Demo:
+![image](https://github.com/taifu9920/icmp-practice/blob/main/demo/demo1.gif?raw=true)
