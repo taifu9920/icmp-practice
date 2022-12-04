@@ -10,4 +10,7 @@
 ##### 7. Fill in the proxy info on HTTP and HTTPS, with `localhost:{The port you liked}`
 ##### 8. Then you're all good, The proxy server should work now
 ## How it Works:
-##### The document still WIP, sorry ;w;
+##### The framework look like below, 
+![image](https://github.com/taifu9920/icmp-practice/blob/main/Framework.png?raw=true)
+##### The main goal on this project is to establish the connection between TCP and ICMP,
+##### So any service can hides inside ICMP, like the demo are Proxy Server.
